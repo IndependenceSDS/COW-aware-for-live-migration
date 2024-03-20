@@ -3,54 +3,36 @@
 #include <assert.h>
 #include <linux/bpf.h>
 #include <bpf/bpf.h>
-#include "bpf_load.h"
+#include <bpf/libbpf.h>
+// #include "bpf_load.h"
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/resource.h>
 
-#define PARSE_IP 3
-#define PARSE_IP_PROG_FD (prog_fd[0])
-#define PROG_ARRAY_FD (map_fd[0])
 
 int main(int argc, char **argv)
 {
-        struct rlimit r = {RLIM_INFINITY, RLIM_INFINITY};
+        struct bpf_object *obj;
+        int map_fd,prog_fd;
         char filename[256];
         int i, err;
-        struct bpf_prog_info info = {};
-        uint32_t info_len = sizeof(info);
-        const char * mountpath = "/sys/fs/bpf/try";
-        int pinned = 0;
         int key=0;
         int value=0;
 
 
         snprintf(filename, sizeof(filename), "%s_kern.o", argv[0]);
-        setrlimit(RLIMIT_MEMLOCK, &r);
 
-        if (load_bpf_file(filename)) {
-                printf("%s", bpf_log_buf);
+        if (bpf_prog_load(filename, BPF_PROG_TYPE_KPROBE,
+                          &obj, &prog_fd)) {
                 return 1;
         }
+        map_fd = bpf_object__find_map_fd_by_name(obj, "pf_num");
 
-
-        // pinned = bpf_obj_pin(map_fd[2], mountpath);
-        // if (pinned < 0) {
-        //         printf("Failed to pin map to the file system: %d (%s)\n", pinned, strerror(errno));
-        //         return -1;
-        // }
-
-        /* Test fd array lookup which returns the id of the bpf_prog */
-        // err = bpf_obj_get_info_by_fd(PARSE_IP_PROG_FD, &info, &info_len);
-        // assert(!err);
-        // err = bpf_map_lookup_elem(PROG_ARRAY_FD, &key, &id);
-        // assert(!err);
-        // assert(id == info.id);
 
         sleep(10);
 
-        bpf_map_lookup_elem(PROG_ARRAY_FD,&key,&value);
-
+        err=bpf_map_lookup_elem(map_fd,&key,&value);
+        if(err==0)
         printf("pf_num: %d",value);
 
         return 0;
