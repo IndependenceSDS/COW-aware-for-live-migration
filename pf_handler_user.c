@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 
         sleep(10);
 
-        bpf_map_lookup_elem(PROG_ARRAY_FD.fd,&key,&value);
+        bpf_map_lookup_elem(PROG_ARRAY_FD,&key,&value);
 
         printf("pf_num: %d",value);
 

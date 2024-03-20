@@ -11,6 +11,7 @@
 #include <uapi/linux/ptrace.h>  
 #include <uapi/linux/bpf.h>  
 #include <linux/sched.h>  
+#include "bpf_helpers.h"
 
 
 struct bpf_map_def SEC("maps") pf_num = {
@@ -23,11 +24,17 @@ struct bpf_map_def SEC("maps") pf_num = {
 
 
 SEC("kprobe/do_page_fault")
-int kprobe__do_page_fault(struct pt_regs *ctx,struct mm_struct *mm, unsigned long addr,
-    unsigned int mm_flags, unsigned long vm_flags,struct pt_regs *regs){
+int kprobe__do_page_fault(struct pt_regs *ctx){
         int key=0;
-
-        bpf_hist_linear_inc(bpf_map_lookup_elem(&pf_num, &key), 1, 1, 1); 
+        int err,value=1;
+        err=bpf_map_lookup_elem(&pf_num, &key,&value);
+        if(err==0){
+            value++;
+            err=bpf_map_update_elem(&pf_num,&key,&value);
+        }else{
+            err=bpf_map_update_elem(&pf_num,&key,&value);
+        }
+        
         return 0;
 
 }
