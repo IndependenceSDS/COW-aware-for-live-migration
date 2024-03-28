@@ -32,10 +32,10 @@ int kprobe__do_page_fault(struct pt_regs *ctx){
         value=bpf_map_lookup_elem(&pf_num, &key);
         if(value!=NULL){
             value++;
-            err=bpf_map_update_elem(&pf_num,&key,&value, BPF_ANY);
+            bpf_map_update_elem(&pf_num,&key,&value, BPF_ANY);
         }else{
-            value=1;
-            err=bpf_map_update_elem(&pf_num,&key,&value, BPF_ANY);
+            err=1;
+            bpf_map_update_elem(&pf_num,&key,&err, BPF_ANY);
         }
         
         return 0;
