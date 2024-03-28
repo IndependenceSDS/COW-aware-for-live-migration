@@ -8,6 +8,8 @@
 // #include <linux/skbuff.h>
 // #include <linux/netfilter.h>
 // #include <net/netfilter/nf_tables.h>
+#include <linux/types.h>
+#include <bpf/bpf.h>
 #include <uapi/linux/ptrace.h>  
 #include <uapi/linux/bpf.h>  
 #include <linux/sched.h>  

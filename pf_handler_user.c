@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
+#include <linux/types.h>
+#include <bpf/bpf.h>
 #include <stdio.h>
 #include <assert.h>
 #include <linux/bpf.h>
-#include <bpf/bpf.h>
 #include <bpf/libbpf.h>
 // #include "bpf_load.h"
 #include <unistd.h>
@@ -20,9 +21,9 @@ int main(int argc, char **argv)
         int value=0;
 
 
-        snprintf(filename, sizeof(filename), "%s_kern.o", argv[0]);
+        // snprintf(filename, sizeof(filename), "%s_kern.o", argv[0]);
 
-        if (bpf_prog_load(filename, BPF_PROG_TYPE_KPROBE,
+        if (bpf_prog_load("pf_handler_kern.o", BPF_PROG_TYPE_KPROBE,
                           &obj, &prog_fd)) {
                 return 1;
         }
