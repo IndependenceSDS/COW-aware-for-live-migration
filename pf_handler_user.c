@@ -31,8 +31,8 @@ int main(int argc, char **argv)
 
         sleep(10);
 
-        value=bpf_map_lookup_elem(map_fd[0],&key);
-        if(value!=NULL)
+        err=bpf_map_lookup_elem(map_fd[0],&key,&value);
+        if(err==0)
         printf("pf_num: %d",value);
 
         return 0;
