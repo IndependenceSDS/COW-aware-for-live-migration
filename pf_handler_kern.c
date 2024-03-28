@@ -29,12 +29,12 @@ SEC("kprobe/do_page_fault")
 int kprobe__do_page_fault(struct pt_regs *ctx){
         int key=0;
         int err,value=1;
-        err=bpf_map_lookup_elem(&pf_num, &key,&value);
-        if(err==0){
+        err=bpf_map_lookup_elem(&pf_num, &key);
+        if(err!=NULL){
             value++;
-            err=bpf_map_update_elem(&pf_num,&key,&value);
+            err=bpf_map_update_elem(&pf_num,&key,&value, BPF_ANY);
         }else{
-            err=bpf_map_update_elem(&pf_num,&key,&value);
+            err=bpf_map_update_elem(&pf_num,&key,&value, BPF_ANY);
         }
         
         return 0;
