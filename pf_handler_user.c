@@ -14,7 +14,7 @@
 int main(int argc, char **argv)
 {
         struct bpf_object *obj;
-        int map_fd,prog_fd;
+        // int map_fd,prog_fd;
         char filename[256];
         int i, err;
         int key=0;
@@ -23,16 +23,15 @@ int main(int argc, char **argv)
 
         // snprintf(filename, sizeof(filename), "%s_kern.o", argv[0]);
 
-        if (bpf_prog_load("pf_handler_kern.o", BPF_PROG_TYPE_KPROBE,
-                          &obj, &prog_fd)) {
+        if (load_bpf_file("pf_handler_kern.o")) {
                 return 1;
         }
-        map_fd = bpf_object__find_map_fd_by_name(obj, "pf_num");
+        // map_fd = bpf_object__find_map_fd_by_name(obj, "pf_num");
 
 
         sleep(10);
 
-        err=bpf_map_lookup_elem(map_fd,&key,&value);
+        err=bpf_map_lookup_elem(map_fd[0],&key,&value);
         if(err==0)
         printf("pf_num: %d",value);
 
