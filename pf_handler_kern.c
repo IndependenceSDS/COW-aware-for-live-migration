@@ -28,11 +28,12 @@ struct bpf_map_def SEC("maps") pf_num = {
 SEC("kprobe/do_page_fault")
 int kprobe__do_page_fault(struct pt_regs *ctx){
         int key=0;
-        int err,value=1;
+        int err;
+        int *value;
         value=bpf_map_lookup_elem(&pf_num, &key);
         if(value!=NULL){
-            value++;
-            bpf_map_update_elem(&pf_num,&key,&value, BPF_ANY);
+            (*value)++;
+            bpf_map_update_elem(&pf_num,&key,value, BPF_ANY);
         }else{
             err=1;
             bpf_map_update_elem(&pf_num,&key,&err, BPF_ANY);
