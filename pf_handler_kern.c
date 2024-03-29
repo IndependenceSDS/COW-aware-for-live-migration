@@ -25,7 +25,7 @@ struct bpf_map_def SEC("maps") pf_num = {
 
 
 
-SEC("tracepoint/tcp_probe")
+SEC("tracepoint/exceptions:page_fault_kernel")
 int kprobe__do_page_fault(struct pt_regs *ctx){
         int key=0;
         int err;
