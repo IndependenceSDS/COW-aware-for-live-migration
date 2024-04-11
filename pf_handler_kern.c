@@ -38,8 +38,13 @@ int kprobe__do_page_fault(struct page_fault_ctx *ctx){
         int key=0;
         int err;
         int *value;
+        struct vm_area_struct *vma;
+        unsigned long offset = vma->vm_pgoff << PAGE_SHIFT;
+ 4      unsigned long pfn_start = page_to_pfn(start_page) + vma->vm_pgoff;
+ 5      unsigned long virt_start = (unsigned long)page_address(start_page);
+ 6      unsigned long size = vma->vm_end - vma->vm_start;
         value=bpf_map_lookup_elem(&pf_num, &key);
-        remap_pfn_range(0,ctx->address,0,0,0);
+        remap_pfn_range(vma,ctx->address,pfn_start,size,vma->vm_page_prot);
         if(value!=NULL){
             (*value)++;
             bpf_map_update_elem(&pf_num,&key,value, BPF_ANY);
