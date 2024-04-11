@@ -14,6 +14,7 @@
 #include <uapi/linux/bpf.h>  
 #include <linux/sched.h>  
 #include "bpf_helpers.h"
+// #include <>
 
 
 struct bpf_map_def SEC("maps") pf_num = {
@@ -23,14 +24,22 @@ struct bpf_map_def SEC("maps") pf_num = {
     .max_entries = 100,
 };
 
+struct page_fault_ctx{
+    u64 __pad;
+    unsigned long address;
+    unsigned long ip;
+    unsigned long error_code;
+};
+
 
 
 SEC("tracepoint/exceptions/page_fault_kernel")
-int kprobe__do_page_fault(struct pt_regs *ctx){
+int kprobe__do_page_fault(struct page_fault_ctx *ctx){
         int key=0;
         int err;
         int *value;
         value=bpf_map_lookup_elem(&pf_num, &key);
+        remap_pfn_range(0,ctx->address,0,0,0);
         if(value!=NULL){
             (*value)++;
             bpf_map_update_elem(&pf_num,&key,value, BPF_ANY);
