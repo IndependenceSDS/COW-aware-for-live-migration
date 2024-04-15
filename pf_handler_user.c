@@ -24,7 +24,7 @@ int main(int argc, char **argv)
         // snprintf(filename, sizeof(filename), "%s_kern.o", argv[0]);
 
         if (load_bpf_file("pf_handler_kern.o")) {
-                return 1;
+                return 10;
         }
         // map_fd = bpf_object__find_map_fd_by_name(obj, "pf_num");
 
