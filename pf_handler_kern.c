@@ -38,9 +38,9 @@ int kprobe__do_page_fault(struct page_fault_ctx *ctx){
         int key=0;
         int err;
         int *value;
-        // struct vm_area_struct *vma=0x12345678;
+        struct vm_area_struct *vma=0x12345678;
         value=bpf_map_lookup_elem(&pf_num, &key);
-        remap_pfn_range(0,ctx->address,0,8,NULL);
+        remap_pfn_range(vma,ctx->address,0,8,vma->vm_page_prot);
         if(value!=NULL){
             (*value)++;
             bpf_map_update_elem(&pf_num,&key,value, BPF_ANY);
